@@ -28,7 +28,7 @@ async function run() {
                     { ...item, 
                       "last_changed": new Date(item.last_changed),
                       "last_updated": new Date(item.last_updated),
-                      "state": parseFloat(item.state)
+                      "state": parseFloat(item.state)===NaN?item.state:parseFloat(item.state)
                     }
                 )});
             console.log(resp.data.length);
