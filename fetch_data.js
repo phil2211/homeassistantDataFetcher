@@ -52,8 +52,8 @@ async function run() {
             console.log(resp.data.length);
             const database = client.db('homeassistant');
             const sensordata = database.collection('sensordata');
-            console.log(JSON.stringify(resp.data, null, 2));
-            //await sensordata.insertMany(resp.data);
+            //console.log(JSON.stringify(resp.data, null, 2));
+            await sensordata.insertMany(resp.data);
             await sleep(10000);
         }
     } finally {
