@@ -14,6 +14,16 @@ const config = {
 const uri = "mongodb+srv://admin:Passw0rd@homeassistant.2i6urhw.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 
+const entities = [
+    "sensor.solarinverter_active_power_load_sys",
+    "sensor.solarinverter_active_power_off_grid_total",
+    "sensor.solarinverter_active_power_pcc_total",
+    "sensor.solarinverter_battery_power_total",
+    "sensor.solarinverter_pv_power_1",
+    "sensor.solarinverter_pv_power_2",
+    "sensor.solarinverter_pv_power_total",
+];
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -22,13 +32,16 @@ async function run() {
     try {
         while (true) {
             const resp = await axios(config);
-            _.remove(resp.data, (item) => !item.entity_id.startsWith('sensor.solarinverter'));
+            _.remove(resp.data, (item) => !entities.includes(item.entity_id));
             resp.data = resp.data.map((item) => {
                 return (
-                    { ...item, 
-                      "last_changed": new Date(item.last_changed),
-                      "last_updated": new Date(item.last_updated),
-                      "state": parseFloat(item.state)===NaN?item.state:parseFloat(item.state)
+                    { 
+                        "entity_id": item.entity_id,
+                        "attributes": item.attributes,
+                        "last_changed": new Date(item.last_changed),
+                        "last_updated": new Date(item.last_updated),
+                        "state": parseFloat(item.state),
+                        "created_at": new Date(),
                     }
                 )});
             console.log(resp.data.length);
