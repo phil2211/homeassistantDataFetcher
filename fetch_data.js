@@ -18,10 +18,15 @@ const entities = [
     "sensor.solarinverter_active_power_load_sys",
     "sensor.solarinverter_active_power_off_grid_total",
     "sensor.solarinverter_active_power_pcc_total",
-    "sensor.solarinverter_battery_power_total",
     "sensor.solarinverter_pv_power_1",
     "sensor.solarinverter_pv_power_2",
     "sensor.solarinverter_pv_power_total",
+    "sensor.solarinverter_battery_capacity_1",
+    "sensor.solarinverter_battery_state_of_health_1",
+    "sensor.solarinverter_battery_temperature_1",
+    "sensor.solarinverter_battery_current_1",
+    "sensor.solarinverter_battery_power_1",
+    "sensor.solarinverter_battery_power_total",
 ];
 
 function sleep(ms) {
@@ -47,8 +52,8 @@ async function run() {
             console.log(resp.data.length);
             const database = client.db('homeassistant');
             const sensordata = database.collection('sensordata');
-            //console.log(JSON.stringify(resp.data, null, 2));
-            await sensordata.insertMany(resp.data);
+            console.log(JSON.stringify(resp.data, null, 2));
+            //await sensordata.insertMany(resp.data);
             await sleep(10000);
         }
     } finally {
