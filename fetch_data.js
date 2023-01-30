@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { MongoClient } = require("mongodb");
+const _ = require('lodash');
 
 const config = {
     method: 'get',
@@ -23,7 +24,10 @@ async function run() {
             const resp = await axios(config);
             resp.data = resp.data.map((item) => {
                 return (
-                    { ...item, "last_changed": new Date(item.last_changed), "last_updated": new Date(item.last_updated) }
+                    { ...item, 
+                      "last_changed": new Date(item.last_changed),
+                      "last_updated": new Date(item.last_updated) 
+                    }
                 )});
             console.log(resp.data.length);
             const database = client.db('homeassistant');
