@@ -22,16 +22,19 @@ async function run() {
     try {
         while (true) {
             const resp = await axios(config);
+            _.remove(resp.data, (item) => !item.entity_id.startsWith('sensor.solarinverter'));
             resp.data = resp.data.map((item) => {
                 return (
                     { ...item, 
                       "last_changed": new Date(item.last_changed),
-                      "last_updated": new Date(item.last_updated) 
+                      "last_updated": new Date(item.last_updated),
+                      "state": parseFloat(item.state)
                     }
                 )});
             console.log(resp.data.length);
             const database = client.db('homeassistant');
             const sensordata = database.collection('sensordata');
+            //console.log(JSON.stringify(resp.data, null, 2));
             await sensordata.insertMany(resp.data);
             await sleep(10000);
         }
