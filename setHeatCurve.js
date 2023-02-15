@@ -1,13 +1,14 @@
 const axios = require('axios');
 const FormData = require('form-data');
 
-const getData = {
-    method: 'get',
-    url: 'http://192.168.1.133/PAGE140.XML',
+const regulation = {
+    method: 'post',
+    url: 'http://192.168.1.133/PAGE215.XML',
     headers: {
-        "Cookie": "SoftPLC=1942220046"
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        "Accept-Encoding": "gzip, deflate"
     }
-}
+}    
 
 const login = {
     method: 'get',
@@ -20,18 +21,13 @@ const login = {
 }
 
 
-function run() {
-    axios(getData)
-        .then((resp) => {
-            console.log(resp.data);
-        });
-    return;
+function setHeatCurve(curveNumber) {
     axios(login)
         .then((resp) => {
-            console.log(resp.data)
+            console.log("LOGIN FORM SUCCESS", resp.data)
         })
         .catch((err) => {
-            console.log(err.response.headers);
+            console.log("LOGIN FORM ERR");
             login.headers["Cookie"] = "SoftPLC=" + getCookie(err.response.headers["set-cookie"][0])
             login.headers["Content-Type"] = "multipart/form-data";
             login.method = "post";
@@ -39,13 +35,31 @@ function run() {
             formData.append("USER", "user");
             formData.append("PASS", getLoginPassword(err.response.headers["set-cookie"][0]));
             login.data = formData;
-            console.log(login);
             axios(login)
                 .then((resp) => {
-                    console.log(resp.data);
+                    console.log("LOGIN SUCCESS", resp.data);
                 })
                 .catch((err) => {
-                    console.log(err.response.headers);
+                    console.log("LOGIN ERR", err.response.headers);
+                    regulation.headers["Cookie"] = "SoftPLC=" + getCookie(err.response.headers["set-cookie"][0])
+                    regulation.headers["Content-Type"] = "application/x-www-form-urlencoded";
+                    regulation.headers["Content-Length"] = "18";
+                    regulation.method = "post";
+                    const params = {
+                        "__R2380_USINT_d": curveNumber
+                    };
+                    const data = Object.keys(params)
+                        .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+                        .join('&');     
+                    console.log(data);
+                    regulation.data = data;
+                    axios(regulation)
+                        .then((resp) => {
+                            console.log("REGULATION SUCCESS", resp.data);
+                        })
+                        .catch((err) => {
+                            console.log("REGULATION ERR", err.response.headers);
+                        })
                 })
         })
 }
@@ -119,11 +133,4 @@ function getLoginPassword(cookieString) {
     }
 }
 
-// const cookie = "SoftPLC=1939913879; Path=/";
-// const a = cookie.indexOf("SoftPLC=") + 8;
-// const b = cookie.indexOf(";", a);
-// console.log(cookie.substring(a, b));
-// console.log(sha1Hash("0"));
-// console.log(sha1Hash(unescape(cookie.substring(a, b)) + "12345678"));
-
-run();
+setHeatCurve("28");
