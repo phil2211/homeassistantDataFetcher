@@ -133,4 +133,11 @@ function getLoginPassword(cookieString) {
     }
 }
 
-setHeatCurve("28");
+setHeatCurve("30");
+
+
+
+
+/*
+<INPUT NAME="__R23925.6_BOOL_i" VALUE="0" /> == Compressor
+*/
